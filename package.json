@@ -1,0 +1,35 @@
+{
+  "name": "mongoose-rollback",
+  "version": "1.0.0",
+  "description": "mongoose rollback machine",
+  "main": "mongoose-rollback.js",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "mongoose": "^3.8.18",
+    "should": "^4.1.0",
+    "supertest": "^0.14.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.0.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Snkz/mongoose-rollback.git"
+  },
+  "keywords": [
+    "mongo",
+    "mongoose",
+    "history",
+    "revisions",
+    "rollback"
+  ],
+  "author": "Abdi Dahir",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Snkz/mongoose-rollback/issues"
+  },
+  "homepage": "https://github.com/Snkz/mongoose-rollback"
+}

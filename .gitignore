@@ -1,0 +1,14 @@
+*~
+*.swp
+
+*.log
+log/*.log.*
+log/*.log
+*.DS_Store
+
+tmp
+node_modules
+
+config/conf
+
+data/
