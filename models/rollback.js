@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var Document = mongoose.Document;
 
 var Schema = mongoose.Schema;
 var collectionName = '_history';
@@ -13,10 +14,11 @@ var RollbackSchema = new Schema({
 
     current_version: {
         type: Number,
-        index: true,
         required: true
     }
 
 });
+
+
 
 module.exports = RollbackSchema;
