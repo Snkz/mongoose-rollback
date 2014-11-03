@@ -1,7 +1,7 @@
 Mongoose Rollback machine 
 =========================
 
-[![Build Status](https://travis-ci.org/Snkz/Mongoose-Rollback)](https://travis-ci.org/Snkz/Rollback)
+[![Build Status](https://travis-ci.org/Snkz/mongoose-rollback)](https://travis-ci.org/Snkz/mongoose-rollback)
 
 Mongoose-Rollback adds rollback abilities to a Model.
 
