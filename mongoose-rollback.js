@@ -1,14 +1,13 @@
 var RollbackSchema = require('./models/rollback.js');
 var mongoose = require('mongoose');
-var Rollback;
 
 function rollbackPlugin (schema, options) {
 
     // assumes collection name exists/
     //var collectionName = schema.collection.name + "_hist";
     var collectionName = options.collectionName + "_hist";
-    console.log(collectionName);
-    
+    var Rollback;
+
     schema.add({ _version: {
             type: Number,
             default: 0

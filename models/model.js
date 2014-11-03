@@ -5,7 +5,8 @@ var rollback = require('../mongoose-rollback');
 var Schema = mongoose.Schema;
 var ModelSchema = new Schema({
     name: {
-        type: String
+        type: String,
+        required: true
         },
 
     createdAt: {
