@@ -19,14 +19,14 @@ Refer to model/model.js for an example on how to set it up.
 The rollback model is stored in a seperate collection, the name is specified in the plugin options, \_hist is appened to the name. It is recommended you use the same collection name as the Schema you intend to keep history for.
 
 ## API
-Most of the extensions happen on instances of the model for convience.
+These extensions happen on <b>instances</b> of the model for convenience.
 Callbacks take the same arguments Mongoose's save does.
 ```javascript
 Model.rollback(version_num, callback(err, model))
 ```
 Rollsback model to version specified by version_num. Returns error if version is greater then models current version (if version supplied in model) and if version number doesnt exist. Note: This is considered an 'update' i.e the version number is incremented and the model is updated with data from a previous revision.
 ```javascript
-Model.rollback(version_num, callback(err, model))
+Model.revert(version_num, callback(err, model))
 ```
 Reverts model to version specified by version_num. Returns error if version is greater then models current version (if version supplied in model) and if version number doesnt exist. Note: This is a destructive update  i.e the version number is set to the supplied version  and the model is updated with data from a previous revision. History after this version number is lost.
 
@@ -44,11 +44,11 @@ The history model can be directly accessed from your Schema. It is added as a st
 
 ### Coming Soon!
 ```javascript
-Model.history(min\_version=0, max\_version=current\_version, callback(err, model_array))
+Model.history(min_version=0, max_version=current_version, callback(err, model_array))
 Returns history of model changes between specified version number.
 ```
 ```javascript
-Schema.plugin({connection: seperate\_mongo\_location})
+Schema.plugin({connection: seperate_mongo_location})
 ```
 Allow for history model to be stored somewhere else.
 
