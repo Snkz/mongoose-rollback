@@ -12,7 +12,7 @@ var RollbackSchema = new Schema({
         required: true
     },
 
-    current_version: {
+    currentVersion: {
         type: Number,
         required: true
     }

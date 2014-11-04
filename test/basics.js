@@ -480,7 +480,7 @@ describe('Mongoose Rollback Machine', function(done) {
             });
         });
 
-        it('should FAIL to rollback to newer version', function(done) {
+        it('should FAIL to revert to newer version', function(done) {
             var model = new Model({name: "hello", data: "world"});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -504,7 +504,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should FAIL to rollback to newer version but update fine after', function(done) {
+        it('should FAIL to revert to newer version but update fine after', function(done) {
             var model = new Model({name: "hello", data: "world"});
             model.save(function(err, model) {
                 if (err) throw (err);
