@@ -1,11 +1,11 @@
 var assert = require('assert');
-var request = require('supertest');
 var should = require('should');
 var mongoose = require('mongoose');
 var _ = require('lodash');
 var Model = require('../models/model.js').Model;
 
 describe('Mongoose Rollback Machine', function(done) {
+    console.log('Testing basic functionailty, the standard use case.');
     before(function(done) {
         mongoose.connect('mongodb://localhost/test', {});
         var db = mongoose.connection;
@@ -275,6 +275,45 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
+        it('should rollback to first version then update fine', function(done) {
+            var model = new Model({name: 'hello', data: 'world'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model.name = "BOO";
+                    model.data = "GHOST";
+
+                    model.save(function(err, model) {
+
+                        model._version.should.be.exactly(2);
+
+                        model.rollback(0, function(err, hist) {
+                            if (err) throw (err);
+
+                            model.name = "guili";
+                            model.data = "ble";
+
+                            model.save(function(err, model) {
+                                if (err) throw (err);
+
+                                model._version.should.be.exactly(4);
+                                model.name.should.match('guili');
+                                model.data.should.match('ble');
+                                done();
+                            });
+                        });
+                    });
+                });
+            });
+            
+        });
+
         it('should FAIL to rollback to newer version', function(done) {
             var model = new Model({name: "hello", data: "world"});
             model.save(function(err, model) {
@@ -298,6 +337,204 @@ describe('Mongoose Rollback Machine', function(done) {
             });
             
         });
+
+        it('should FAIL to rollback to newer version but update fine after', function(done) {
+            var model = new Model({name: "hello", data: "world"});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model._version.should.be.exactly(0);
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model._version.should.be.exactly(1);
+
+                    model.rollback(5, function(err, hist) {
+                        err.should.be.ok;
+                        assert(hist === null);
+
+                        model.name = 'Bro';
+
+                        model.save(function(err, model) {
+                            model.name.should.match('Bro');
+                            model._version.should.be.exactly(2);
+                            done();
+                        });
+                    });
+                });
+            });
+            
+        });
+    });
+
+    describe('Revert Hell', function(done) {
+
+        it('should revert to previous version', function(done) {
+            var name = 'Hello';
+            var data = 'World';
+            var model = new Model({name: name, data: data});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.should.have.property('_version');
+                model._version.should.be.exactly(0);
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model.should.have.property('_version');
+                    model._version.should.be.exactly(1);
+
+                    model.revert(0, function(err, hist) {
+                        if (err) throw (err);
+                        // hist is output of save
+                        hist.name.should.match(name);
+                        hist.data.should.match(data);
+                        hist._version.should.equal(0);
+                        
+                        // model == hist on success 
+                        model.name.should.match(name);
+                        model.data.should.match(data);
+                        model._version.should.equal(0);
+                        done();
+                    });
+                });
+            });
+            
+        });
+
+        it('should revert to the first version', function(done) {
+            var name = 'Hello';
+            var data = 'World';
+            var model = new Model({name: name, data: data});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.should.have.property('_version');
+                model._version.should.be.exactly(0);
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model.should.have.property('_version');
+                    model._version.should.be.exactly(1);
+
+                    model.revert(0, function(err, hist) {
+                        if (err) throw (err);
+                        hist.name.should.match(name);
+                        hist.data.should.match(data);
+                        hist._version.should.equal(0);
+                        
+                        model.name.should.match(name);
+                        model.data.should.match(data);
+                        model._version.should.equal(0);
+                        done();
+                    });
+                });
+            });
+            
+        });
+
+        it('should revert to first version then update fine', function(done) {
+            var model = new Model({name: 'hello', data: 'world'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model.name = "BOO";
+                    model.data = "GHOST";
+
+                    model.save(function(err, model) {
+
+                        model._version.should.be.exactly(2);
+
+                        model.revert(0, function(err, hist) {
+                            if (err) throw (err);
+
+                            model.name = "guili";
+                            model.data = "ble";
+
+                            model.save(function(err, model) {
+                                if (err) throw (err);
+
+                                model._version.should.be.exactly(1);
+                                model.name.should.match('guili');
+                                model.data.should.match('ble');
+                                done();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+
+        it('should FAIL to rollback to newer version', function(done) {
+            var model = new Model({name: "hello", data: "world"});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model._version.should.be.exactly(0);
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model._version.should.be.exactly(1);
+
+                    model.revert(5, function(err, hist) {
+                        err.should.be.ok;
+                        assert(hist === null);
+                        done();
+                    });
+                });
+            });
+            
+        });
+
+        it('should FAIL to rollback to newer version but update fine after', function(done) {
+            var model = new Model({name: "hello", data: "world"});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model._version.should.be.exactly(0);
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model._version.should.be.exactly(1);
+
+                    model.revert(5, function(err, hist) {
+                        err.should.be.ok;
+                        assert(hist === null);
+
+                        model.name = 'Bro';
+
+                        model.save(function(err, model) {
+                            model.name.should.match('Bro');
+                            model._version.should.be.exactly(2);
+                            done();
+                        });
+                    });
+                });
+            });
+            
+        });
+
     });
 });
 

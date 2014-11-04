@@ -123,94 +123,90 @@ function rollbackPlugin (schema, options) {
 
     // Update state to new version with updates from previous version
     schema.methods.rollback = function(version, callback) {
+        console.log('ROLLING BACK...');
         var id = this._id;
         var v = this._version;
         var self = this;
 
         Rollback.findOne({"_id": id }, 
-                { "data": { "$elemMatch": { "_version": version } } },   
-                function(err, hist) {
-                    if (err) { 
-                        callback(err, null);
-                        return
-                    }
-
-                    // update each field in model with old_version
-                    var prevModel = hist.data[0];
-                    if (typeof prevModel === 'undefined') {
-                        callback({err: "Model at version" 
-                            + version + " does not exist"} , null);
-                        return;
-                    }
-
-                    Object.keys(prevModel).forEach(function(key) {
-                        self[key] = prevModel[key];
-                    });
-                    // undo version change  
-                    self['_version'] = v; 
-
-                    // save changes and callback take care of rest
-                    self.save(callback);
-
+            { "data": { "$elemMatch": { "_version": version } } },   
+            function(err, hist) {
+                if (err) { 
+                    callback(err, null);
+                    return
                 }
+
+                // update each field in model with old_version
+                var prevModel = hist.data[0];
+                if (typeof prevModel === 'undefined') {
+                    callback({err: "Model at version" 
+                        + version + " does not exist"} , null);
+                    return;
+                }
+
+                Object.keys(prevModel).forEach(function(key) {
+                    self[key] = prevModel[key];
+                });
+
+                // undo version change  
+                self['_version'] = v; 
+
+                // save changes and callback take care of rest
+                self.save(callback);
+
+            }
         );
     }
 
     // Revert state to previous update, remove new revisions
     schema.methods.revert = function(version, callback) {
+        console.log('REVERTING ...');
         var id = this._id;
         var v = this._version;
         var self = this;
 
         Rollback.findOne({"_id": id }, 
-                { "data": { "$elemMatch": { "_version": version } } },   
-                function(err, hist) {
-                    if (err) { 
-                        callback(err, null);
-                        return
-                    }
+            { "data": { "$elemMatch": { "_version": version } } },   
+            function(err, hist) {
+                if (err) { 
+                    callback(err, null);
+                    return
+                }
 
-                    // update each field in model with old_version
-                    var prevModel = hist.data[0];
-                    if (typeof prevModel === 'undefined') {
-                        callback({err: "Model at version" 
-                            + version + " does not exist"} , null);
-                        return;
-                    }
+                // update each field in model with old_version
+                var prevModel = hist.data[0];
+                if (typeof prevModel === 'undefined') {
+                    callback({err: "Model at version" 
+                        + version + " does not exist"} , null);
+                    return;
+                }
 
-                    Object.keys(prevModel).forEach(function(key) {
-                        self[key] = prevModel[key];
-                    });
+                // Revert changes to model at v = version 
+                Object.keys(prevModel).forEach(function(key) {
+                    self[key] = prevModel[key];
+                });
+
+                // Decrement version number (changes haven't been recorded yet);
+                self['_version'] = version - 1;
+
+                // remove previous revisions
+                Rollback.update({ "_id": id },
+                    { current_version: version, 
+                      $pull: { "data": { "_version" : { "$gte": version }}}},
+                    { multi: true },
+                    
+                    function(err) {
+                    if (err) {
+                        console.log(err);
+                        return; // couldn't remove array stuff
+                    }
 
                     // save changes and callback take care of rest
-                    self['_version'] = version - 1; // will be incremented in save so;
-                    self.save(function(err, model) {
-                        if (err) {
-                            callback(err);
-                            return; // could not revert
-                        }
+                    self.save(callback);
 
-                        // remove previous revisions
-                        Rollback.update({ "_id": id },
-                            { current_version: version, 
-                              $pull: { "data": { "_version" : { "$gt": version } } } },
-                            { multi: true },
-                            
-                            function(err, hist) {
-                            if (err) {
-                                console.log(err);
-                                return; // couldn't remove array stuff
-                            }
-
-                            console.log("CLEANED UP TO VERSION %d", version);
-                            console.log(hist);
-                        });
-
-                        callback(null);
-
-                    });
-
-                }
+                });
+            
+            }
         );
     }
 }
