@@ -9,9 +9,13 @@ Look up previous document revisions as well as rollback\revert to any previous v
 
 Requires \_id field to exist and be a valid ObjectId field (12 byte string / 24 char hex)
 
-A new field \_version is added to the model, this can be ignored safely. 
+A new field _version is added to the model, this can be ignored safely. An index can be set for this in the plugin options.
 
 The \_\_v field is used by mongoose to help with concurrent updates, this is not altered in anyway.
+
+Refer to model/model.js for an example on how to set it up.
+
+The rollback model is stored in a seperate collection, the name is specified in the plugin options, \_hist is appened to the name. It is recommended you use the same collection name as the Schema you intend to keep history for.
 
 ## API
 
@@ -30,9 +34,14 @@ Returns model at revision version_num Errors version does not exist.
 Model.currentVersion() 
 Returns the current version number, this is different the checking the \_version field as it queries the history model instead. Can help with concurrent updates with outdated copies of a model.
 
+The history model can be directly accessed from your Schema. It is added as a static variable called RollbackModel.
 
-Model.history(min_version=0, max_version=current_version, callback(err, model_array))
-Returns history of model changes between specified version number..
+#### Coming Soon!
+Model.history(min\_version=0, max\_version=current\_version, callback(err, model_array))
+Returns history of model changes between specified version number.
+
+Schema.plugin({connection: seperate\_mongo\_location})
+Allow for history model to be stored somewhere else
 
 
 ## About concurrency
