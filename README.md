@@ -45,8 +45,8 @@ The history model can be directly accessed from your Schema. It is added as a st
 ### Coming Soon!
 ```javascript
 Model.history(min_version=0, max_version=current_version, callback(err, model_array))
-Returns history of model changes between specified version number.
 ```
+Returns history of model changes between specified version number.
 ```javascript
 Schema.plugin({connection: seperate_mongo_location})
 ```
