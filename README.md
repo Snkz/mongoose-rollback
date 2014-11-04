@@ -5,22 +5,41 @@ Mongoose Rollback machine
 
 Mongoose-Rollback adds rollback abilities to a Model.
 
-Look up previous document revisions as well as rollback to any previous version.
+Look up previous document revisions as well as rollback\revert to any previous version.
 
-Requires _id field to be present and __v field to exist (this should already be the case by default).
+Requires \_id field to exist and be a valid ObjectId field (12 byte string / 24 char hex)
+
+A new field \_version is added to the model, this can be ignored safely. 
+
+The \_\_v field is used by mongoose to help with concurrent updates, this is not altered in anyway.
 
 ## API
 
-NOTE: THIS IS ALL TEMPORARY JUST LISTING OUT INTENDED FUNCTIONALITY!! 
+Most of the extensions happen on instances of the model for convience.
+Callbacks take the same arguments Mongoose's save does.
 
-Model.rollback(version_num, callback(err, obj))
-Reverts model to version specified by version_num. Returns error if version is greater then models current version (if version supplied in model) and if version number doesnt exist.
+Model.rollback(version_num, callback(err, model))
+Rollsback model to version specified by version_num. Returns error if version is greater then models current version (if version supplied in model) and if version number doesnt exist. Note: This is considered an 'update' i.e the version number is incremented and the model is updated with data from a previous revision.
 
-Model.findRevision(id, version_num, callback(err, obj))
-Returns model at revision version_num with specified id. Errors if obj not found or revision does not exist.
+Model.rollback(version_num, callback(err, model))
+Reverts model to version specified by version_num. Returns error if version is greater then models current version (if version supplied in model) and if version number doesnt exist. Note: This is a destructive update  i.e the version number is set to the supplied version  and the model is updated with data from a previous revision. History after this version number is lost.
 
-Model.diff(version_num, callback(err, obj_array))
-Returns array of diffs between models revision num. Errors if id/revision does not exist.
+Model.getVersion(version_num, callback(err, model))
+Returns model at revision version_num Errors version does not exist.
 
-Model.findDiff(id, version_num, callback(err, obj_array))
-Returns array of diffs between id's current revision num and version_num. Errors if id/revision does not exist.
+Model.currentVersion() 
+Returns the current version number, this is different the checking the \_version field as it queries the history model instead. Can help with concurrent updates with outdated copies of a model.
+
+
+Model.history(min_version=0, max_version=current_version, callback(err, model_array))
+Returns history of model changes between specified version number..
+
+
+## About concurrency
+
+Currently this is only tested with single updates to a model. I will make sure to allow the model to be updated from two seperate locations (currenly not tested) without breaking the revisioning system. Rollbacks will also soon work fine concurrenlty as well (rollbacks == updates under the hood);
+
+Reverts however are dangerous, I will not make any promises on this right now but using mongooses \_\_v field a may be able to sort this out at some point.
+
+Either way, it is best to not revert willy-nilly. That should be a privileged operation!
+
