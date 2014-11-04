@@ -1,7 +1,6 @@
 var assert = require('assert');
 var should = require('should');
 var mongoose = require('mongoose');
-var _ = require('lodash');
 var Model = require('../models/model.js').Model;
 
 describe('Mongoose Rollback Machine', function(done) {

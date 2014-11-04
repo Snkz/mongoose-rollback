@@ -4,12 +4,11 @@
   "description": "mongoose rollback machine",
   "main": "mongoose-rollback.js",
   "dependencies": {
-    "lodash": "^2.4.1",
     "mongoose": "^3.8.18",
-    "should": "^4.1.0"
   },
   "devDependencies": {
-    "mocha": "^2.0.1"
+    "mocha": "^2.0.1",
+    "should": "^4.1.0"
   },
   "scripts": {
     "test": "mocha"
