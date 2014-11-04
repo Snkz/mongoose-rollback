@@ -9,12 +9,13 @@ var RollbackSchema = new Schema({
     data: {
         //XXX: Consider making this a sub document
         type: [Anything],
-        required: true
+        required: true,
     },
 
     currentVersion: {
         type: Number,
-        required: true
+        required: true,
+        index: true
     }
 
 });
