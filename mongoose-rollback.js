@@ -11,7 +11,7 @@ function rollbackPlugin (schema, options) {
 
     schema.add({ _version: {
             type: Number,
-            default: -1
+            default: 0
         }
     })
 

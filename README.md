@@ -38,19 +38,21 @@ Returns model at revision version_num Errors version does not exist.
 Model.currentVersion() 
 ```
 Returns the current version number, this is different the checking the \_version field as it queries the history model instead. Can help with concurrent updates with outdated copies of a model.
+```javascript
+Model.history(min_version=0, max_version=current_version, callback(err, model_array))
+```
+Returns history of model changes between specified version number.
 
 The history model can be directly accessed from your Schema. It is added as a static variable called RollbackModel.
 
 
 ### Coming Soon!
 ```javascript
-Model.history(min_version=0, max_version=current_version, callback(err, model_array))
-```
-Returns history of model changes between specified version number.
-```javascript
 Schema.plugin({connection: seperate_mongo_location})
 ```
 Allow for history model to be stored somewhere else.
+
+Delete support, will add field 'deleted' and just keep it at that. Can kind of wipe history now if you revert to 0 but will also add support for that too.
 
 ## About concurrency
 Currently this is only tested with single updates to a model. I will make sure to allow the model to be updated from two seperate locations (currenly not tested) without breaking the revisioning system. Rollbacks will also soon work fine concurrenlty as well (rollbacks == updates under the hood);

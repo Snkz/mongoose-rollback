@@ -48,7 +48,7 @@ describe('Mongoose Rollback Machine', function(done) {
                 assert(typeof saved_model === 'undefined');
 
                 model.should.have.property('_version');
-                model._version.should.be.exactly(-1);
+                model._version.should.be.exactly(0);
                 done();
 
             });
@@ -140,7 +140,7 @@ describe('Mongoose Rollback Machine', function(done) {
                     model.should.have.property('_version');
                     model._version.should.be.exactly(1);
 
-                    model.findVersion(1, function(err, hist) {
+                    model.getVersion(1, function(err, hist) {
                         if (err) throw (err);
 
                         hist._id.should.match(model._id);
@@ -169,7 +169,7 @@ describe('Mongoose Rollback Machine', function(done) {
                     model.should.have.property('_version');
                     model._version.should.be.exactly(1);
 
-                    model.findVersion(0, function(err, hist) {
+                    model.getVersion(0, function(err, hist) {
                         if (err) throw (err);
 
                         hist._id.should.match(model._id);
@@ -187,9 +187,94 @@ describe('Mongoose Rollback Machine', function(done) {
             model.save(function(err, model) {
                 if (err) throw (err);
 
-                model.findVersion(5, function(err, hist) {
+                model.getVersion(5, function(err, hist) {
                     err.should.be.ok;
                     assert(typeof hist === 'undefined');
+                    done();
+                });
+                
+            });
+            
+        });
+    });
+
+
+    describe('History of history', function(done) {
+
+        it('should retrieve history', function(done) {
+            var model = new Model({name: 'Hello', data: 'World'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.name = "Hey";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model.history(0, 1, function(err, hist) {
+                        if (err) throw (err);
+
+                        hist.should.have.length(2);
+                        done();
+                    });
+                });
+            });
+
+        });
+
+        it('should retrieve only first item in history', function(done) {
+            var model = new Model({name: 'Hello', data: 'World'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model.history(0, 0, function(err, hist) {
+                        if (err) throw (err);
+
+                        hist.should.have.length(1);
+                        hist[0].name.should.match('Hello');
+                        done();
+                    });
+                });
+            });
+            
+        });
+        
+        it('should retrieve only last item in history', function(done) {
+            var model = new Model({name: 'Hello', data: 'World'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+                    model.history(1, 10, function(err, hist) {
+                        if (err) throw (err);
+
+                        hist.should.have.length(1);
+                        hist[0].name.should.match('Hey');
+                        done();
+                    });
+                });
+            });
+            
+        });
+
+        it('should fail to retrive history', function(done) {
+            var model = new Model({name: 'Hello', data: 'World'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.history(5, 5, function(err, hist) {
+                    hist.should.have.length(0);
                     done();
                 });
                 
