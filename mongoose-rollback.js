@@ -2,6 +2,7 @@ var RollbackSchema = require('./models/rollback.js');
 var mongoose = require('mongoose');
 var buildRollbackMethods = require('./lib/methods.js');
 var buildSaveMethods = require('./lib/save.js');
+var buildStaticFunctions = require('./lib/statics.js');
 
 function rollbackPlugin (schema, options) {
 
@@ -30,11 +31,14 @@ function rollbackPlugin (schema, options) {
  
     schema.statics.RollbackModel = Rollback;
 
-    /* STORAGE METHODS (happen transparently)*/
+    /* STORAGE METHODS (happen transparently) */
     buildSaveMethods(schema);
 
     /* DOCUMENT METHODS (happen on instances of a model)*/
     buildRollbackMethods(schema);
+
+    /* SCHEMA FUNCTIONS (statics altering collection */
+    buildStaticFunctions(schema);
 
 }
 

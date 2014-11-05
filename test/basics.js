@@ -10,12 +10,17 @@ describe('Mongoose Rollback Machine', function(done) {
         var db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection err:'));
         db.once('open', function() {
-            console.log('Connected to Mongo DB at ' + db.host + ":" + db.port);
+            //console.log('Connected to Mongo DB at ' + db.host + ":" + db.port);
         });
 
         done();
     });
-    
+
+    after(function(done) {
+        mongoose.disconnect();
+        done();
+    });
+
     beforeEach(function(done) {
         Model.find({}).remove(function(err, result) {
             if (err) throw (err);
@@ -87,7 +92,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should increment ONLY on succesful updates', function(done) {
+        it('should increment ONLY on SUCCESFUL updates', function(done) {
             var model = new Model({name: 'Hello', data: 'World'});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -124,7 +129,7 @@ describe('Mongoose Rollback Machine', function(done) {
 
     describe('Version Value', function(done) {
 
-        it('should retrieve current version', function(done) {
+        it('should retrieve CURRENT version', function(done) {
             var model = new Model({name: 'Hello', data: 'World'});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -182,7 +187,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should fail to retrive newer version', function(done) {
+        it('should FAIL to retrive newer version', function(done) {
             var model = new Model({name: 'Hello', data: 'World'});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -222,7 +227,7 @@ describe('Mongoose Rollback Machine', function(done) {
 
         });
 
-        it('should retrieve only first item in history', function(done) {
+        it('should retrieve ONLY FIRST item in history', function(done) {
             var model = new Model({name: 'Hello', data: 'World'});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -245,7 +250,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
         
-        it('should retrieve only last item in history', function(done) {
+        it('should retrieve ONLY LAST item in history', function(done) {
             var model = new Model({name: 'Hello', data: 'World'});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -268,7 +273,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should fail to retrive history', function(done) {
+        it('should FAIL to retrive history', function(done) {
             var model = new Model({name: 'Hello', data: 'World'});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -285,7 +290,7 @@ describe('Mongoose Rollback Machine', function(done) {
 
     describe('Rollback Hell', function(done) {
 
-        it('should rollback to previous version', function(done) {
+        it('should rollback to PREVIOUS version', function(done) {
             var name = 'Hello';
             var data = 'World';
             var model = new Model({name: name, data: data});
@@ -319,7 +324,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should rollback to first version', function(done) {
+        it('should rollback to FIRST version', function(done) {
             var name = 'Hello';
             var data = 'World';
             var model = new Model({name: name, data: data});
@@ -359,7 +364,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should rollback to first version then update fine', function(done) {
+        it('should rollback to FIRST version then update fine', function(done) {
             var model = new Model({name: 'hello', data: 'world'});
             model.save(function(err, model) {
                 if (err) throw (err);
@@ -456,7 +461,7 @@ describe('Mongoose Rollback Machine', function(done) {
 
     describe('Revert Hell', function(done) {
 
-        it('should revert to previous version', function(done) {
+        it('should revert to PREVIOUS version', function(done) {
             var name = 'Hello';
             var data = 'World';
             var model = new Model({name: name, data: data});
@@ -492,7 +497,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should revert to the first version', function(done) {
+        it('should revert to the FIRST version', function(done) {
             var name = 'Hello';
             var data = 'World';
             var model = new Model({name: name, data: data});
@@ -526,7 +531,7 @@ describe('Mongoose Rollback Machine', function(done) {
             
         });
 
-        it('should revert to first version then update fine', function(done) {
+        it('should revert to FIRST version then update fine', function(done) {
             var model = new Model({name: 'hello', data: 'world'});
             model.save(function(err, model) {
                 if (err) throw (err);
