@@ -16,19 +16,28 @@ function rollbackPlugin (schema, options) {
         }
     })
 
-    // avoid recompilation
-    if (mongoose.models.Rollback) {
-        Rollback = mongoose.model('Rollback');
-    } else {
-        Rollback = mongoose.model('Rollback', RollbackSchema, collectionName);
-    }
-
+    // assumes connection happens before plugin or something? not sure but yea..
+    var conn = mongoose; // default connection in mongoose object;
 
     // add index on version field
     if (options && options.index) {
         schema.path('_version').index(options.index)
     } 
- 
+
+    // get connection
+    if (options && options.conn) {
+        var conn = mongoose.connect(options.conn);
+    } 
+
+    // avoid recompilation
+    if (mongoose.models.Rollback) {
+        Rollback = conn.model('Rollback');
+    } else {
+        Rollback = conn.model('Rollback', RollbackSchema, collectionName);
+    }
+
+
+
     schema.statics.RollbackModel = Rollback;
 
     /* STORAGE METHODS (happen transparently) */

@@ -24,7 +24,11 @@ var ModelSchema = new Schema({
 
 );
 
-ModelSchema.plugin(rollback, {index: true, collectionName: 'model_collection'});
+ModelSchema.plugin(rollback, {
+    index: true, 
+    //conn: 'mongodb://localhost/test', required if connection isn't explict
+    collectionName: 'model_collection' 
+});
 
 var Model;
 

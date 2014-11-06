@@ -216,7 +216,7 @@ describe('Mongoose Rollback Machine', function(done) {
                 model.save(function(err, model) {
                     if (err) throw (err);
 
-                    model.history(0, 1, function(err, hist) {
+                    model.history(0, 2, function(err, hist) {
                         if (err) throw (err);
 
                         hist.should.have.length(2);
@@ -238,7 +238,7 @@ describe('Mongoose Rollback Machine', function(done) {
                 model.save(function(err, model) {
                     if (err) throw (err);
 
-                    model.history(0, 0, function(err, hist) {
+                    model.history(0, 1, function(err, hist) {
                         if (err) throw (err);
 
                         hist.should.have.length(1);
