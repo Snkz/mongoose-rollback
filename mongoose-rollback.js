@@ -36,8 +36,6 @@ function rollbackPlugin (schema, options) {
         Rollback = conn.model('Rollback', RollbackSchema, collectionName);
     }
 
-
-
     schema.statics.RollbackModel = Rollback;
 
     /* STORAGE METHODS (happen transparently) */

@@ -73,7 +73,7 @@ Reverts model to version specified by version_num. Returns error if version is g
 ```javascript
 Model.getVersion(version_num, callback(err, model))
 ```
-Returns model at revision version_num Errors version does not exist.
+Returns model at revision version_num Errors version does not exist. Creates a version 0 if neccassary;
 ```javascript
 Model.currentVersion() 
 ```
@@ -81,9 +81,7 @@ Returns the current version number, this is different the checking the \_version
 ```javascript
 Model.history(min_version=0, max_version=current_version, callback(err, model_array))
 ```
-Returns history of model changes between specified version number.
-
-The history model can be directly accessed from your Schema. It is added as a static variable called RollbackModel.
+Returns history of model changes between specified version number. Creates a version 0 if neccassary. Pass in values (0, BIG) to get all of your history;
 
 ```javascript
 Schema.plugin({connection: seperate_mongo_location})
@@ -91,11 +89,22 @@ Schema.plugin({connection: seperate_mongo_location})
 Allow for history model to be stored somewhere else.
 
 
+The history model can be directly accessed from your Schema. It is added as a static variable called RollbackModel.
+
 ### Coming Soon!
 Delete support, will add field 'deleted' and just keep it at that. Can kind of wipe history now if you revert to 0 but will also add support for that too.
 
 ## About concurrency
 Currently this is only tested with single updates to a model. I will make sure to allow the model to be updated from two seperate locations (currenly not tested) without breaking the revisioning system. Rollbacks will also soon work fine concurrenlty as well (rollbacks == updates under the hood);
+
+Initial commits to the hist model are also kind of iffy cause of \_id collisions
+
+The following three ops CAN create new hist models:
+    save
+    getVersion
+    history
+
+Try not to do anything concurrently on models that haven't been init'd through mongoose's save. Updates after are A-OK.
 
 Reverts however are dangerous, I will not make any promises on this right now but using mongooses \_\_v field a may be able to sort this out at some point.
 

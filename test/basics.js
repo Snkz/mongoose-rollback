@@ -127,7 +127,7 @@ describe('Mongoose Rollback Machine', function(done) {
         });
     });
 
-    describe('Version Value', function(done) {
+    describe('Version Hell', function(done) {
 
         it('should retrieve CURRENT version', function(done) {
             var model = new Model({name: 'Hello', data: 'World'});
@@ -203,6 +203,59 @@ describe('Mongoose Rollback Machine', function(done) {
         });
     });
 
+    describe('Current version #', function(done) {
+
+        it('should retrieve CURRENT version NUMBER', function(done) {
+            var model = new Model({name: 'Hello', data: 'World'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.name = "Hey";
+                model.data = "Yo";
+
+                model.save(function(err, model) {
+                    if (err) throw (err);
+
+
+                    model.currentVersion(function(err, version) {
+                        if (err) throw (err);
+                        version.currentVersion.should.match(1);
+                        done();
+                    });
+                });
+            });
+
+        });
+
+        it('should retrieve CURRENT version NUMBER after ONE save', function(done) {
+            var model = new Model({name: 'Hello', data: 'World'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.currentVersion(function(err, version) {
+                    if (err) throw (err);
+                    version.currentVersion.should.match(0);
+                    done();
+                });
+            });
+        });
+
+        it('should FAIL to get currentVersion number', function(done) {
+            Model.collection.insert({name: 'Hello', data: 'World'}, function(err, model) {
+                if (err) throw (err);
+
+                var model = new Model(model[0]);
+                model.currentVersion(function(err, hist) {
+                    if (err) throw (err);
+                    assert(hist === null);
+                    done();
+
+                });
+                
+            });
+            
+        });
+    });
 
     describe('History of history', function(done) {
 
@@ -283,6 +336,41 @@ describe('Mongoose Rollback Machine', function(done) {
                     done();
                 });
                 
+            });
+        });
+
+        it('should asyncly build history!', function(done) {
+            Model.collection.insert({name: 'UNIQUE', data: 'World'}, function(err, model) {
+                if (err) throw (err);
+
+                Model.findOne({'name': 'UNIQUE'}, function(err, model) {
+                    model._version.should.match(0);
+                    model.currentVersion(function(err, ver) {
+                        assert(ver === null);
+                        model.history(0, 100, function(err, hist) {
+                            if (err) throw (err);
+                            var hist = hist[0];
+                            hist.name.should.match('UNIQUE');
+                            hist._version.should.equal(0);
+
+                            model.history(0, 100, function(err, hist) {
+
+                                if (err) throw (err);
+                                var hist = hist[0];
+                                hist.name.should.match('UNIQUE');
+                                hist._version.should.equal(0);
+
+                                model.name = 'Hey';
+                                model.save(function(err, saved_model) {
+                                    saved_model.name.should.match('Hey');
+                                    saved_model._version.should.equal(1);
+                                    done();
+                                });
+                            });
+
+                        });
+                    });
+                });
             });
             
         });
