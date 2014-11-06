@@ -8,16 +8,60 @@ Mongoose-Rollback adds rollback abilities to a Model.
 
 Look up previous document revisions as well as rollback\revert to any previous version.
 
-Requires \_id field to exist and be a valid ObjectId field (12 byte string / 24 char hex)
+Requires _id field to exist (true by default) Has not been tested on custom _id fields as of yet. (i.e should be object id);
 
 A new field _version is added to the model, this can be ignored safely. An index can be set for this in the plugin options.
 
 The \_\_v field is used by mongoose to help with concurrent updates, this is not altered in anyway.
 
-Refer to model/model.js for an example on how to set it up.
-
 The rollback model is stored in a seperate collection, the name is specified in the plugin options, \_hist is appened to the name. It is recommended you use the same collection name as the Schema you intend to keep history for.
 
+Make sure to supply your connection name as an option (conn: mongodb://host/db} to the options field. Sometimes it can work without, most of the times no.
+
+### Example Setup
+```javascript
+
+var mongoose = require('mongoose');
+var rollback = require('../mongoose-rollback');
+
+var Schema = mongoose.Schema;
+var ModelSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+        },
+
+    createdAt: {
+        type: Date,
+        default: Date.now
+        },
+    
+    data: {
+        type: String
+        }
+    },
+    { 
+        id: false 
+    } // remove mongoose virt field
+
+);
+
+ModelSchema.plugin(rollback, {
+    index: true, // index on _version field
+    conn: 'mongodb://localhost/test', // required if connection isn't explict
+    collectionName: 'model_collection' // your collection name or custom collection
+});
+
+var Model;
+
+if (mongoose.models.Model) {
+    Model = mongoose.model('Model');
+} else {
+    Model = mongoose.model('Model', ModelSchema, 'model_collection');
+}
+
+exports.Model = Model;
+```
 ## API
 These extensions happen on <b>instances</b> of the model for convenience.
 Callbacks take the same arguments Mongoose's save does.
@@ -45,13 +89,13 @@ Returns history of model changes between specified version number.
 
 The history model can be directly accessed from your Schema. It is added as a static variable called RollbackModel.
 
-
-### Coming Soon!
 ```javascript
 Schema.plugin({connection: seperate_mongo_location})
 ```
 Allow for history model to be stored somewhere else.
 
+
+### Coming Soon!
 Delete support, will add field 'deleted' and just keep it at that. Can kind of wipe history now if you revert to 0 but will also add support for that too.
 
 ## About concurrency
