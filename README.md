@@ -22,7 +22,7 @@ Make sure to supply your connection name as an option (conn: mongodb://host/db} 
 ```javascript
 
 var mongoose = require('mongoose');
-var rollback = require('../mongoose-rollback');
+var rollback = require('mongoose-rollback');
 
 var Schema = mongoose.Schema;
 var ModelSchema = new Schema({
@@ -39,11 +39,7 @@ var ModelSchema = new Schema({
     data: {
         type: String
         }
-    },
-    { 
-        id: false 
-    } // remove mongoose virt field
-
+    }
 );
 
 ModelSchema.plugin(rollback, {
