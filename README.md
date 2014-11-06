@@ -58,6 +58,46 @@ if (mongoose.models.Model) {
 
 exports.Model = Model;
 ```
+
+### Example usage 
+```javascript
+describe('Rollback Hell', function(done) {
+
+    it('should rollback to PREVIOUS version', function(done) {
+        var name = 'Hello';
+        var data = 'World';
+        var model = new Model({name: name, data: data});
+        model.save(function(err, model) {
+            if (err) throw (err);
+
+            model.should.have.property('_version');
+            model._version.should.be.exactly(0);
+            model.name = "Hey";
+            model.data = "Yo";
+
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.should.have.property('_version');
+                model._version.should.be.exactly(1);
+
+                model.rollback(0, function(err, hist) {
+                    if (err) throw (err);
+                    hist.name.should.match(name);
+                    hist.data.should.match(data);
+                    hist._version.should.equal(2);
+                    
+                    model.name.should.match(name);
+                    model.data.should.match(data);
+                    model._version.should.equal(2);
+                    done();
+                });
+            });
+        });
+        
+    });
+});
+```
 ## API
 These extensions happen on <b>instances</b> of the model for convenience.
 Callbacks take the same arguments Mongoose's save does.
@@ -94,6 +134,8 @@ The history model can be directly accessed from your Schema. It is added as a st
 ### Coming Soon!
 Delete support, will add field 'deleted' and just keep it at that. Can kind of wipe history now if you revert to 0 but will also add support for that too.
 
+Build history on the fly, currently only updates add entries to the history model. In the VERY near future, any method call will store a copy of the model if one does not exist. This will be good for things such as bulk uploads where history cannot be generated (by passing mongoose).
+
 ## About concurrency
 Currently this is only tested with single updates to a model. I will make sure to allow the model to be updated from two seperate locations (currenly not tested) without breaking the revisioning system. Rollbacks will also soon work fine concurrenlty as well (rollbacks == updates under the hood);
 
@@ -124,3 +166,6 @@ Model.find({field: value}, function (err, model) {
     });
 });
 ```
+
+
+Finally, this is being updated very rapidly. Please open issues, report bugs etc and I will get to them.
