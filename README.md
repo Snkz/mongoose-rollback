@@ -124,7 +124,7 @@ Model.history(min_version=0, max_version=current_version, callback(err, model_ar
 Returns history of model changes between specified version number. Creates a version 0 if neccassary. Pass in values (0, BIG) to get all of your history;
 
 ```javascript
-Schema.plugin({connection: seperate_mongo_location})
+Schema.plugin({conn: seperate_mongo_location})
 ```
 Allow for history model to be stored somewhere else.
 
@@ -148,7 +148,7 @@ The following three ops CAN create new hist models:
 
 Try not to do anything concurrently on models that haven't been init'd through mongoose's save. Updates after are A-OK.
 
-Reverts however are dangerous, I will not make any promises on this right now but using mongooses \_\_v field a may be able to sort this out at some point.
+Reverts however are dangerous, I will not make any promises on this right now but using mongooses \_\_v field I may be able to sort this out at some point.
 
 Either way, it is best to not revert willy-nilly. That should be a privileged operation!
 
@@ -159,9 +159,6 @@ Mongoose does not hook into findByIdUpdate/remove mongo methods. Those bypass an
 Model.find({field: value}, function (err, model) {
     model.somefield = somevalue;
     model.save(function (err, updatedModel) {
-        if(err) {
-            console.error(err);
-        }
         // more code
     });
 });
