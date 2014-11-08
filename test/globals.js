@@ -83,7 +83,7 @@ describe('Mongoose Rollback Machine', function(done) {
                     var id = model._id;
                     model.currentVersion(function(err, ver) {
                         assert(ver === null);
-                        Model.updateHistory(id, function(err, hist) {
+                        Model.initHistory(id, function(err, hist) {
                             if (err) throw (err);
                             hist.should.have.length(1);
                             var hist = hist[0];
@@ -117,7 +117,7 @@ describe('Mongoose Rollback Machine', function(done) {
             model.save(function(err, model) {
                 if (err) throw (err);
                 var id = model._id;
-                Model.updateHistory(id, function(err, hist) {
+                Model.initHistory(id, function(err, hist) {
                     err.should.be.ok;
                     assert(hist === null);
 
