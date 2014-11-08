@@ -19,4 +19,5 @@ deploy:
     secure: G0TqAmwGj4gIglLpdkbEbRsZAzq1sKDB6ia/pZJMK/2ZxAaILjKORsNKROYRqYe4YVevO8OmBKEQ9NKzTtI5ToMcJZNtqrsgxawXUW105Sm/rJ0uRM4TwGrR7R3+YICxQzex6Rp6G9wJCRNeBa9AurbEYY0r0iXfdMWG6wHGHHU=
   on:
     tags: true
+    all_branches: true
     repo: Snkz/mongoose-rollback
