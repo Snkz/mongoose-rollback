@@ -18,6 +18,8 @@ The rollback model is stored in a seperate collection, the name is specified in 
 
 Make sure to supply your connection name as an option (conn: mongodb://host/db} to the options field. Sometimes it can work without, most of the times no.
 
+DELETES CASCADE! Delete your model => history is removed. I trust that you know what youre doing. 
+
 ### Example Setup
 ```javascript
 
@@ -132,9 +134,10 @@ Allow for history model to be stored somewhere else.
 The history model can be directly accessed from your Schema. It is added as a static variable called RollbackModel.
 
 ### Coming Soon!
-Delete support, will add field 'deleted' and just keep it at that. Can kind of wipe history now if you revert to 0 but will also add support for that too.
 
-Build history on the fly, currently only updates add entries to the history model. In the VERY near future, any method call will store a copy of the model if one does not exist. This will be good for things such as bulk uploads where history cannot be generated (by passing mongoose).
+Handle concurrency, (see below)
+
+Mark models to prevent history updates (can be toggled on the fly);
 
 ## About concurrency
 Currently this is only tested with single updates to a model. I will make sure to allow the model to be updated from two seperate locations (currenly not tested) without breaking the revisioning system. Rollbacks will also soon work fine concurrenlty as well (rollbacks == updates under the hood);
@@ -163,6 +166,18 @@ Model.find({field: value}, function (err, model) {
     });
 });
 ```
+Likewise, deletes should also be done through mongoose. Make sure to do one of the following
 
+```javescript
+Model.remove({_id: id}).exec(function(err, num_removed) {
+    // more code
+});
+
+// OR on a model instance
+
+model.remove(function(err, model) {
+    // more code
+});
+```
 
 Finally, this is being updated very rapidly. Please open issues, report bugs etc and I will get to them.

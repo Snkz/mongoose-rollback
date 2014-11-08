@@ -749,5 +749,47 @@ describe('Mongoose Rollback Machine', function(done) {
         });
 
     });
+
+    describe('Remove hell', function(done) {
+
+        it('should remove model and its history', function(done) {
+            var model = new Model({name: 'Hello', data: 'World'});
+            model.save(function(err, model) {
+                if (err) throw (err);
+
+                model.remove(function(err, rmodel) {
+                    if (err) throw (err);
+
+                    model.currentVersion(function(err, hist) {
+                        if (err) throw (err);
+                        assert(hist === null);
+                        done();
+
+                    });
+                });
+            });
+
+        });
+
+        it('should remove model and NOT err cause of lack of history', function(done) {
+            Model.collection.insert({name: 'Hello', data: 'World'}, function(err, model) {
+                if (err) throw (err);
+
+                var model = new Model(model[0]);
+                model.remove(function(err, rmodel) {
+                    if (err) throw (err);
+
+                    model.currentVersion(function(err, hist) {
+                        if (err) throw (err);
+                        assert(hist === null);
+                        done();
+
+                    });
+                
+                });
+            });
+        });
+    });
+
 });
 
