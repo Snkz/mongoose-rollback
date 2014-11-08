@@ -180,4 +180,4 @@ model.remove(function(err, model) {
 });
 ```
 
-Finally, this is being updated very rapidly. Please open issues, report bugs etc and I will get to them.
+Finally, this is ready to use but being updated very rapidly. Please open issues, report bugs etc and I will get to them.
