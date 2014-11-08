@@ -194,10 +194,45 @@ describe('Mongoose Rollback Machine', function(done) {
 
                 model.getVersion(5, function(err, hist) {
                     err.should.be.ok;
-                    assert(typeof hist === 'undefined');
+                    assert(hist === null);
                     done();
                 });
                 
+            });
+            
+        });
+
+        it('should asyncly get version!', function(done) {
+            Model.collection.insert({name: 'UNIQUE', data: 'World'}, function(err, model) {
+                if (err) throw (err);
+
+                Model.findOne({'name': 'UNIQUE'}, function(err, model) {
+                    model._version.should.match(0);
+                    model.currentVersion(function(err, ver) {
+                        assert(ver === null);
+                        model.getVersion(0, function(err, hist) {
+                            if (err) throw (err);
+                            hist.name.should.match('UNIQUE');
+                            hist._version.should.equal(0);
+
+                            // confirm nothing got borked
+                            model.getVersion(0, function(err, hist) {
+
+                                if (err) throw (err);
+                                hist.name.should.match('UNIQUE');
+                                hist._version.should.equal(0);
+
+                                model.name = 'Hey';
+                                model.save(function(err, saved_model) {
+                                    saved_model.name.should.match('Hey');
+                                    saved_model._version.should.equal(1);
+                                    done();
+                                });
+                            });
+
+                        });
+                    });
+                });
             });
             
         });
@@ -353,6 +388,7 @@ describe('Mongoose Rollback Machine', function(done) {
                             hist.name.should.match('UNIQUE');
                             hist._version.should.equal(0);
 
+                            // confirm nothing got borked
                             model.history(0, 100, function(err, hist) {
 
                                 if (err) throw (err);
