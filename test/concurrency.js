@@ -80,27 +80,18 @@ describe('Mongoose Rollback Machine', function(done) {
                 model.save(function(err, newmodel) {
                     if (err) throw (err);
 
-                    console.log(newmodel);
-                    console.log(err);
-                    //model.name.should.match('Hey');
-                    console.log(newmodel._version);
                 });
 
                 model.name = "Booyah";
                 model.save(function(err, newmodel) {
                     if (err) throw (err);
 
-                    console.log(newmodel);
-                    console.log(err);
-                    //model.name.should.match('Booyah');
-                    console.log(newmodel._version);
                 });
 
                 // realbad
                 setTimeout(function() {
                     model.history(0, 100, function(err, models) {
-                        console.log(models);
-                        console.log(err);
+                        models.should.have.length(2);
                     });
                     done();
                 }, 200);

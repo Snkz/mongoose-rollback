@@ -140,9 +140,10 @@ Handle concurrency, (see below)
 Mark models to prevent history updates (can be toggled on the fly);
 
 ## About concurrency
-Currently this is only tested with single updates to a model. I will make sure to allow the model to be updated from two seperate locations (currenly not tested) without breaking the revisioning system. Rollbacks will also soon work fine concurrenlty as well (rollbacks == updates under the hood);
 
-Initial commits to the hist model are also kind of iffy cause of \_id collisions
+Concurrent saves currently work like they do in mongo, latest update wins. Initial commits to the hist model are also kind of iffy cause of \_id collisions. Avoid initing history for an existing model concurrently.
+
+Rollbacks have not been tested concurrently, however they are expected to work like save. Last rollback is the one that will happen. Confirm version value after a rollback incase you expect to do such a thing often.
 
 The following three ops CAN create new hist models:
     save
@@ -151,9 +152,7 @@ The following three ops CAN create new hist models:
 
 Try not to do anything concurrently on models that haven't been init'd through mongoose's save. Updates after are A-OK.
 
-Reverts however are dangerous, I will not make any promises on this right now but using mongooses \_\_v field I may be able to sort this out at some point.
-
-Either way, it is best to not revert willy-nilly. That should be a privileged operation!
+Reverts however are dangerous, I will not make any promises. I will document expected behaviour after more testing. Either way, it is best to not revert willy-nilly. That should be a privileged operation!
 
 ## About Mongoose
 Mongoose does not hook into findByIdUpdate/remove mongo methods. Those bypass any middleware by design, including this rollback system. In order to keep history correctly make sure to use this pattern for updates instead.
@@ -166,7 +165,7 @@ Model.find({field: value}, function (err, model) {
     });
 });
 ```
-Likewise, deletes should also be done through mongoose. Make sure to do one of the following
+Likewise, deletes should also be done through mongoose. Make sure to do one of the following:
 
 ```javescript
 Model.remove({_id: id}).exec(function(err, num_removed) {
@@ -179,5 +178,7 @@ model.remove(function(err, model) {
     // more code
 });
 ```
+
+They're other mongoose ways to update/delete, they should work fine. Incase an issue does come up, try the above and report it please.
 
 Finally, this is ready to use but being updated very rapidly. Please open issues, report bugs etc and I will get to them.
