@@ -1,5 +1,4 @@
 var RollbackSchema = require('./models/rollback.js');
-var mongoose = require('mongoose');
 var buildRollbackMethods = require('./lib/methods.js');
 var buildSaveMethods = require('./lib/save.js');
 var buildStaticFunctions = require('./lib/statics.js');
@@ -17,7 +16,8 @@ function rollbackPlugin (schema, options) {
     })
 
     // assumes connection happens before plugin or something? not sure but yea..
-    var conn = mongoose; // default connection in mongoose object;
+    var mongoose = require('mongoose');
+    var conn = mongoose;
 
     // add index on version field
     if (options && options.index) {

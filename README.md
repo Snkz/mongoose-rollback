@@ -16,7 +16,7 @@ The \_\_v field is used by mongoose to help with concurrent updates, this is not
 
 The rollback model is stored in a seperate collection, the name is specified in the plugin options, \_hist is appened to the name. It is recommended you use the same collection name as the Schema you intend to keep history for.
 
-Make sure to supply your connection name as an option (conn: mongodb://host/db} to the options field. Sometimes it can work without, most of the times no.
+Make sure to supply your connection name as an option (conn: mongodb://host/db} to the options field if you intend to use a seperate connection!.
 
 DELETES CASCADE! Delete your model => history is removed. I trust that you know what youre doing. 
 
