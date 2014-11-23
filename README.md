@@ -156,7 +156,9 @@ This is also done on calls to .getVersion(0, callback); and .history(0,max, call
 ### Coming Soon!
 Handle concurrency, (see below)
 
-Mark models to prevent history updates (can be toggled on the fly);
+Mark models to prevent history updates (can be toggled on the fly).
+Allow for storage of diffs along with full model. 
+Remove requirement to add in collection name removed.
 
 ## About concurrency
 Concurrent saves currently work like they do in mongo, latest update wins. Initial commits to the hist model are also kind of iffy cause of \_id collisions. Avoid initing history for an existing model concurrently.
