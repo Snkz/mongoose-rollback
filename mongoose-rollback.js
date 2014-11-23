@@ -2,7 +2,7 @@ var RollbackSchema = require('./models/rollback.js');
 var buildRollbackMethods = require('./lib/methods.js');
 var buildSaveMethods = require('./lib/save.js');
 var buildStaticFunctions = require('./lib/statics.js');
-
+var models = {};
 function rollbackPlugin (schema, options) {
 
     /* SCHEMA CHANGES */
@@ -30,22 +30,23 @@ function rollbackPlugin (schema, options) {
     } 
 
     // avoid recompilation
-    if (mongoose.models.Rollback) {
-        Rollback = conn.model('Rollback');
+    if (models[collectionName]) {
+        Rollback = models[collectionName];
     } else {
-        Rollback = conn.model('Rollback', RollbackSchema, collectionName);
+        models[collectionName] = conn.model(collectionName, RollbackSchema, collectionName);
+        Rollback = models[collectionName];
     }
 
     schema.statics.RollbackModel = Rollback;
 
     /* STORAGE METHODS (happen transparently) */
-    buildSaveMethods(schema);
+    buildSaveMethods(schema, options);
 
     /* DOCUMENT METHODS (happen on instances of a model)*/
-    buildRollbackMethods(schema);
+    buildRollbackMethods(schema, options);
 
     /* SCHEMA FUNCTIONS (statics altering collection */
-    buildStaticFunctions(schema);
+    buildStaticFunctions(schema, options);
 
 }
 
