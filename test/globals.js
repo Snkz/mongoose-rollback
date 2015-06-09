@@ -51,7 +51,7 @@ describe('Mongoose Rollback Machine', function(done) {
                             if(err) throw (err);
                             hists.should.have.length(2);
                             Model.wipeHistory(function(err, wiped) {
-                                wiped.should.match(hists.length);
+                                wiped.result.n.should.match(hists.length);
                                 done();
                             });
                         });
@@ -65,7 +65,7 @@ describe('Mongoose Rollback Machine', function(done) {
                 if(err) throw (err);
                 hists.should.have.length(0);
                 Model.wipeHistory(function(err, wiped) {
-                    wiped.should.match(hists.length);
+                    wiped.result.n.should.match(hists.length);
                     done();
                 });
             });

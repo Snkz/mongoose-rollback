@@ -91,9 +91,10 @@ describe('Mongoose Rollback Machine', function(done) {
                 // realbad
                 setTimeout(function() {
                     model.history(0, 100, function(err, models) {
+                        if (err) throw (err);
                         models.should.have.length(2);
+                        done();
                     });
-                    done();
                 }, 200);
 
             });
