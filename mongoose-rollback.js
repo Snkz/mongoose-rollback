@@ -34,9 +34,6 @@ function rollback(mongoose) {
             Rollback = models[collectionName];
         }
 
-        console.log(models[collectionName]);
-
-
         schema.statics.RollbackModel = Rollback;
 
         /* STORAGE METHODS (happen transparently) */
