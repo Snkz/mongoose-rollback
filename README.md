@@ -24,7 +24,7 @@ DELETES CASCADE! Delete your model => history is removed. I trust that you know 
 ```javascript
 
 var mongoose = require('mongoose');
-var rollback = require('mongoose-rollback');
+var rollback = require('mongoose-rollback')(mongoose);
 
 var Schema = mongoose.Schema;
 var ModelSchema = new Schema({
@@ -46,7 +46,6 @@ var ModelSchema = new Schema({
 
 ModelSchema.plugin(rollback, {
     index: true, // index on _version field
-    conn: 'mongodb://localhost/test', // required if connection isn't explict
     collectionName: 'model_collection' // your collection name or custom collection
 });
 
@@ -122,7 +121,7 @@ Model.currentVersion()
 ```
 Returns the current version number, this is different the checking the \_version field as it queries the history model instead. Can help with concurrent updates with outdated copies of a model.
 ```javascript
-model.history(min_version=0, max_version=current_version, callback(err, model_array))
+model.getHistory(min_version=0, max_version=current_version, callback(err, model_array))
 ```
 Returns history of model changes between specified version number. Creates a version 0 if neccassary. Pass in values (0, BIG) to get all of your history;
 
