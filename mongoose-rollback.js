@@ -18,6 +18,10 @@ function rollback(mongoose) {
             _version: {
                 type: Number,
                 default: 0
+            },
+            _action: {
+                type: String,
+                default: 'create'
             }
         });
 
