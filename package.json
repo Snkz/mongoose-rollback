@@ -1,6 +1,6 @@
 {
   "name": "mongoose-rollback-2",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "mongoose rollback machine",
   "main": "mongoose-rollback.js",
   "dependencies": {
